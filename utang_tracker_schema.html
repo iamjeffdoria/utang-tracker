@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Utang Tracker – Database Schema</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0D0F14;
+    --surface: #151820;
+    --card: #1C2030;
+    --border: #2A2F40;
+    --accent: #F5C842;
+    --accent2: #4ECFB3;
+    --accent3: #E06C8A;
+    --accent4: #7B8FFF;
+    --accent5: #FF9A5C;
+    --accent6: #A78BFA;
+    --accent7: #5CC8FF;
+    --text: #E8EAF2;
+    --muted: #6B7290;
+    --pk: #F5C842;
+    --fk: #4ECFB3;
+  }
+
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    padding: 40px;
+    min-height: 100vh;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  header h1 {
+    font-family: 'Space Mono', monospace;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+
+  header p {
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 40px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .legend span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .legend .dot {
+    width: 10px; height: 10px; border-radius: 2px;
+  }
+
+  .schema-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .table-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .table-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  }
+
+  .table-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .table-icon {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .table-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    flex: 1;
+  }
+
+  .table-desc {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+
+  .row-count {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    background: var(--surface);
+    padding: 2px 7px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+
+  .fields {
+    padding: 8px 0;
+  }
+
+  .field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 16px;
+    font-size: 12.5px;
+    border-bottom: 1px solid transparent;
+    transition: background 0.15s;
+  }
+
+  .field:hover {
+    background: rgba(255,255,255,0.03);
+  }
+
+  .field:last-child {
+    border-bottom: none;
+  }
+
+  .field-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    letter-spacing: 0.3px;
+  }
+
+  .badge-pk {
+    background: rgba(245,200,66,0.15);
+    color: var(--pk);
+    border: 1px solid rgba(245,200,66,0.3);
+  }
+
+  .badge-fk {
+    background: rgba(78,207,179,0.12);
+    color: var(--fk);
+    border: 1px solid rgba(78,207,179,0.25);
+  }
+
+  .badge-none {
+    width: 38px;
+  }
+
+  .field-name {
+    color: var(--text);
+    font-weight: 500;
+    flex: 1;
+  }
+
+  .field-type {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+
+  .field-type.type-uuid { color: #7B8FFF; }
+  .field-type.type-string { color: #4ECFB3; }
+  .field-type.type-decimal { color: #FF9A5C; }
+  .field-type.type-bool { color: #E06C8A; }
+  .field-type.type-date { color: #5CC8FF; }
+  .field-type.type-text { color: #A78BFA; }
+  .field-type.type-json { color: #F5C842; }
+  .field-type.type-ts { color: #5CC8FF; }
+
+  .relationships {
+    max-width: 1200px;
+    margin: 40px auto 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .rel-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .rel-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+  }
+
+  .rel-item {
+    padding: 12px 16px;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+
+  .rel-item:nth-child(4n) { border-right: none; }
+
+  .rel-from { color: var(--accent); font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; }
+  .rel-arrow { color: var(--muted); font-size: 11px; margin: 3px 0; display: flex; align-items: center; gap: 6px; }
+  .rel-to { color: var(--fk); font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; }
+  .rel-type { color: var(--muted); font-size: 10px; margin-top: 2px; }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-top: 4px;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🇵🇭 UTANG TRACKER — DATABASE SCHEMA</h1>
+  <p>Full relational schema for tracking debts, payments, and gentle reminders</p>
+</header>
+
+<div class="legend">
+  <span><span class="dot" style="background:rgba(245,200,66,0.4);border:1px solid var(--pk)"></span> Primary Key (PK)</span>
+  <span><span class="dot" style="background:rgba(78,207,179,0.3);border:1px solid var(--fk)"></span> Foreign Key (FK)</span>
+  <span><span class="dot" style="background:rgba(123,143,255,0.3);border:1px solid var(--accent4)"></span> uuid</span>
+  <span><span class="dot" style="background:rgba(78,207,179,0.3);border:1px solid var(--accent2)"></span> string</span>
+  <span><span class="dot" style="background:rgba(255,154,92,0.3);border:1px solid var(--accent5)"></span> decimal</span>
+  <span><span class="dot" style="background:rgba(92,200,255,0.3);border:1px solid var(--accent7)"></span> date/timestamp</span>
+  <span><span class="dot" style="background:rgba(167,139,250,0.3);border:1px solid var(--accent6)"></span> text/json</span>
+</div>
+
+<div class="schema-grid">
+
+  <!-- USERS -->
+  <div class="table-card">
+    <div class="table-header" style="border-top: 3px solid var(--accent)">
+      <div class="table-icon" style="background:rgba(245,200,66,0.15)">👤</div>
+      <div>
+        <div class="table-name" style="color:var(--accent)">users</div>
+        <div class="table-desc">App account holders</div>
+      </div>
+    </div>
+    <div class="fields">
+      <div class="field"><span class="field-badge badge-pk">PK</span><span class="field-name">id</span><span class="field-type type-uuid">uuid</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">full_name</span><span class="field-type type-string">string</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">phone_number</span><span class="field-type type-string">string</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">email</span><span class="field-type type-string">string</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">avatar_url</span><span class="field-type type-string">string</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">created_at</span><span class="field-type type-ts">timestamp</span></div>
+    </div>
+  </div>
+
+  <!-- CONTACTS -->
+  <div class="table-card">
+    <div class="table-header" style="border-top: 3px solid var(--accent4)">
+      <div class="table-icon" style="background:rgba(123,143,255,0.15)">👥</div>
+      <div>
+        <div class="table-name" style="color:var(--accent4)">contacts</div>
+        <div class="table-desc">People in your utang circle</div>
+      </div>
+    </div>
+    <div class="fields">
+      <div class="field"><span class="field-badge badge-pk">PK</span><span class="field-name">id</span><span class="field-type type-uuid">uuid</span></div>
+      <div class="field"><span class="field-badge badge-fk">FK</span><span class="field-name">user_id</span><span class="field-type type-uuid">uuid</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">nickname</span><span class="field-type type-string">string</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">full_name</span><span class="field-type type-string">string</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">phone_number</span><span class="field-type type-string">string</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">relationship</span><span class="field-type type-string">string</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">is_trusted</span><span class="field-type type-bool">boolean</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">created_at</span><span class="field-type type-ts">timestamp</span></div>
+    </div>
+  </div>
+
+  <!-- DEBTS -->
+  <div class="table-card">
+    <div class="table-header" style="border-top: 3px solid var(--accent3)">
+      <div class="table-icon" style="background:rgba(224,108,138,0.15)">💸</div>
+      <div>
+        <div class="table-name" style="color:var(--accent3)">debts</div>
+        <div class="table-desc">Core utang records</div>
+      </div>
+    </div>
+    <div class="fields">
+      <div class="field"><span class="field-badge badge-pk">PK</span><span class="field-name">id</span><span class="field-type type-uuid">uuid</span></div>
+      <div class="field"><span class="field-badge badge-fk">FK</span><span class="field-name">lender_id</span><span class="field-type type-uuid">uuid</span></div>
+      <div class="field"><span class="field-badge badge-fk">FK</span><span class="field-name">borrower_id</span><span class="field-type type-uuid">uuid</span></div>
+      <div class="field"><span class="field-badge badge-fk">FK</span><span class="field-name">contact_id</span><span class="field-type type-uuid">uuid</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">amount</span><span class="field-type type-decimal">decimal</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">currency</span><span class="field-type type-string">string</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">label</span><span class="field-type type-string">string</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">notes</span><span class="field-type type-text">text</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">status</span><span class="field-type type-string">string</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">due_date</span><span class="field-type type-date">date</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">settled_at</span><span class="field-type type-date">date</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">created_at</span><span class="field-type type-ts">timestamp</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">updated_at</span><span class="field-type type-ts">timestamp</span></div>
+    </div>
+  </div>
+
+  <!-- PAYMENTS -->
+  <div class="table-card">
+    <div class="table-header" style="border-top: 3px solid var(--accent2)">
+      <div class="table-icon" style="background:rgba(78,207,179,0.15)">💳</div>
+      <div>
+        <div class="table-name" style="color:var(--accent2)">payments</div>
+        <div class="table-desc">Partial or full bayad records</div>
+      </div>
+    </div>
+    <div class="fields">
+      <div class="field"><span class="field-badge badge-pk">PK</span><span class="field-name">id</span><span class="field-type type-uuid">uuid</span></div>
+      <div class="field"><span class="field-badge badge-fk">FK</span><span class="field-name">debt_id</span><span class="field-type type-uuid">uuid</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">amount</span><span class="field-type type-decimal">decimal</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">paid_at</span><span class="field-type type-date">date</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">proof_url</span><span class="field-type type-string">string</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">note</span><span class="field-type type-text">text</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">created_at</span><span class="field-type type-ts">timestamp</span></div>
+    </div>
+  </div>
+
+  <!-- REMINDERS -->
+  <div class="table-card">
+    <div class="table-header" style="border-top: 3px solid var(--accent5)">
+      <div class="table-icon" style="background:rgba(255,154,92,0.15)">🔔</div>
+      <div>
+        <div class="table-name" style="color:var(--accent5)">reminders</div>
+        <div class="table-desc">Scheduled follow-up nudges</div>
+      </div>
+    </div>
+    <div class="fields">
+      <div class="field"><span class="field-badge badge-pk">PK</span><span class="field-name">id</span><span class="field-type type-uuid">uuid</span></div>
+      <div class="field"><span class="field-badge badge-fk">FK</span><span class="field-name">debt_id</span><span class="field-type type-uuid">uuid</span></div>
+      <div class="field"><span class="field-badge badge-fk">FK</span><span class="field-name">created_by</span><span class="field-type type-uuid">uuid</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">type</span><span class="field-type type-string">string</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">tone</span><span class="field-type type-string">string</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">message_text</span><span class="field-type type-text">text</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">sent</span><span class="field-type type-bool">boolean</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">scheduled_at</span><span class="field-type type-ts">timestamp</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">sent_at</span><span class="field-type type-ts">timestamp</span></div>
+    </div>
+  </div>
+
+  <!-- NUDGE TEMPLATES -->
+  <div class="table-card">
+    <div class="table-header" style="border-top: 3px solid var(--accent6)">
+      <div class="table-icon" style="background:rgba(167,139,250,0.15)">💬</div>
+      <div>
+        <div class="table-name" style="color:var(--accent6)">nudge_templates</div>
+        <div class="table-desc">Saved message templates</div>
+      </div>
+    </div>
+    <div class="fields">
+      <div class="field"><span class="field-badge badge-pk">PK</span><span class="field-name">id</span><span class="field-type type-uuid">uuid</span></div>
+      <div class="field"><span class="field-badge badge-fk">FK</span><span class="field-name">user_id</span><span class="field-type type-uuid">uuid</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">label</span><span class="field-type type-string">string</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">tone</span><span class="field-type type-string">string</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">message_body</span><span class="field-type type-text">text</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">is_default</span><span class="field-type type-bool">boolean</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">created_at</span><span class="field-type type-ts">timestamp</span></div>
+    </div>
+  </div>
+
+  <!-- ACTIVITY LOG — spans full width -->
+  <div class="table-card" style="grid-column: 1 / -1;">
+    <div class="table-header" style="border-top: 3px solid var(--accent7)">
+      <div class="table-icon" style="background:rgba(92,200,255,0.15)">📋</div>
+      <div>
+        <div class="table-name" style="color:var(--accent7)">activity_log</div>
+        <div class="table-desc">Audit trail — every change, every event, forever</div>
+      </div>
+    </div>
+    <div class="fields" style="display:grid;grid-template-columns:repeat(4,1fr);">
+      <div class="field"><span class="field-badge badge-pk">PK</span><span class="field-name">id</span><span class="field-type type-uuid">uuid</span></div>
+      <div class="field"><span class="field-badge badge-fk">FK</span><span class="field-name">debt_id</span><span class="field-type type-uuid">uuid</span></div>
+      <div class="field"><span class="field-badge badge-fk">FK</span><span class="field-name">actor_id</span><span class="field-type type-uuid">uuid</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">event_type</span><span class="field-type type-string">string</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">metadata</span><span class="field-type type-json">jsonb</span></div>
+      <div class="field"><span class="field-badge badge-none"></span><span class="field-name">created_at</span><span class="field-type type-ts">timestamp</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Relationships -->
+<div class="relationships">
+  <div class="rel-header">
+    🔗 &nbsp;TABLE RELATIONSHIPS
+  </div>
+  <div class="rel-grid">
+    <div class="rel-item">
+      <div class="rel-from">users</div>
+      <div class="rel-arrow">→ <span style="color:var(--accent4)">contacts</span></div>
+      <div class="rel-type">one-to-many · manages</div>
+    </div>
+    <div class="rel-item">
+      <div class="rel-from">users</div>
+      <div class="rel-arrow">→ <span style="color:var(--accent3)">debts</span> (lender)</div>
+      <div class="rel-type">one-to-many · lends money</div>
+    </div>
+    <div class="rel-item">
+      <div class="rel-from">users</div>
+      <div class="rel-arrow">→ <span style="color:var(--accent3)">debts</span> (borrower)</div>
+      <div class="rel-type">one-to-many · owes money</div>
+    </div>
+    <div class="rel-item">
+      <div class="rel-from">contacts</div>
+      <div class="rel-arrow">→ <span style="color:var(--accent3)">debts</span></div>
+      <div class="rel-type">one-to-many · linked to debt</div>
+    </div>
+    <div class="rel-item">
+      <div class="rel-from">debts</div>
+      <div class="rel-arrow">→ <span style="color:var(--accent2)">payments</span></div>
+      <div class="rel-type">one-to-many · has payments</div>
+    </div>
+    <div class="rel-item">
+      <div class="rel-from">debts</div>
+      <div class="rel-arrow">→ <span style="color:var(--accent5)">reminders</span></div>
+      <div class="rel-type">one-to-many · triggers nudges</div>
+    </div>
+    <div class="rel-item">
+      <div class="rel-from">debts</div>
+      <div class="rel-arrow">→ <span style="color:var(--accent7)">activity_log</span></div>
+      <div class="rel-type">one-to-many · full audit trail</div>
+    </div>
+    <div class="rel-item">
+      <div class="rel-from">users</div>
+      <div class="rel-arrow">→ <span style="color:var(--accent6)">nudge_templates</span></div>
+      <div class="rel-type">one-to-many · creates templates</div>
+    </div>
+  </div>
+</div>
+
+<footer style="margin-top: 32px; padding: 16px; text-align: center;">
+  <p style="font-size: 11px; color: var(--muted);">status values: active · partial · settled · forgiven · disputed &nbsp;|&nbsp; tone values: malambot · direkta · biro</p>
+</footer>
+
+</body>
+</html>
