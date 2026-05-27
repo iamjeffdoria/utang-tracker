@@ -16,7 +16,7 @@ export default function SignUp() {
     try {
       setLoading(true)
       const { createdSessionId, setActive } = await startOAuthFlow({
-        redirectUrl: Linking.createURL('/', { scheme: 'myapp' }),
+        redirectUrl: Linking.createURL('/', { scheme: 'utangtracker' }),
       })
         if (createdSessionId) {
         await setActive!({ session: createdSessionId }) 
