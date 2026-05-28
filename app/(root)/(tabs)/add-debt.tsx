@@ -1,6 +1,8 @@
 import { Ionicons } from '@expo/vector-icons'
 import DateTimePicker from '@react-native-community/datetimepicker'
-import { useEffect, useState } from 'react'
+import { useFocusEffect } from 'expo-router'
+import { useCallback, useState } from 'react'
+
 import {
   Alert,
   Modal,
@@ -43,10 +45,12 @@ export default function AddDebt() {
   // List filter
   const [listSearch, setListSearch] = useState('')
 
-  useEffect(() => {
-    fetchContacts()
-    fetchDebts()
-  }, [])
+  useFocusEffect(
+    useCallback(() => {
+      fetchContacts()
+      fetchDebts()
+    }, [])
+  )
 
   const filteredContacts = [...contactList]
     .filter((c) =>
