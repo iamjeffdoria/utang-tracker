@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
 import { useCallback, useState } from 'react'
 import { ActivityIndicator, Image, Text, TouchableOpacity, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 WebBrowser.maybeCompleteAuthSession()
 
@@ -29,7 +30,7 @@ export default function SignUp() {
   }, [startOAuthFlow])
 
   return (
-    <View className="flex-1 bg-slate-50 items-center justify-center px-6">
+    <SafeAreaView className="flex-1 bg-slate-50 items-center justify-center px-6">
 
       {/* Decorative blobs */}
       <View className="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-green-500/10" />
@@ -112,6 +113,6 @@ export default function SignUp() {
         <Text className="text-slate-500 underline">Terms</Text> &amp;{' '}
         <Text className="text-slate-500 underline">Privacy Policy</Text>.
       </Text>
-    </View>
+    </SafeAreaView>
   )
 }

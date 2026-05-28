@@ -4,7 +4,9 @@ import { Poppins_400Regular, Poppins_600SemiBold, Poppins_700Bold, Poppins_800Ex
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 import { Slot } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import NoInternetScreen from '../components/NoInternetScreen';
 import { runMigrations } from '../db/migrate';
@@ -48,7 +50,7 @@ useEffect(() => {
   };
 }, []);
   useEffect(() => {
-    runMigrations().then(() => setDbReady(true));
+    runMigrations().then(() => setDbReady(true)); 
   }, []);
 
 useEffect(() => {
@@ -65,9 +67,12 @@ useEffect(() => {
   }
 
   return (
+    <SafeAreaProvider>
+      <StatusBar style="dark" translucent={false} />
     <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
       <Slot />
       <Toast />
     </ClerkProvider>
+    </SafeAreaProvider>
   );
 }

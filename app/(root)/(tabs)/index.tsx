@@ -13,10 +13,12 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import Toast from 'react-native-toast-message'
 import { useContacts } from '../../../hooks/useContacts'
 import { useDebts } from '../../../hooks/useDebts'
+import { useNotifications } from '../../../hooks/useNotifications'
 
 export default function HomeScreen() {
   const { contactList, fetchContacts, addContact, deleteContact, updateContact } = useContacts()
   const { debtList, fetchDebts } = useDebts()
+  const { addNotification } = useNotifications()
   const [modalVisible, setModalVisible] = useState(false)
   const [fullName, setFullName] = useState('')
   const [lastName, setLastName] = useState('')
@@ -39,6 +41,11 @@ export default function HomeScreen() {
     if (!fullName.trim()) return
     setSaving(true)
     await addContact(fullName.trim(), lastName.trim() || undefined)
+    await addNotification({
+      type: 'new',
+      title: 'Contact Added',
+      message: `${fullName.trim()}${lastName.trim() ? ' ' + lastName.trim() : ''} was added to your contacts.`,
+    })
     setFullName('')
     setLastName('')
     setSaving(false)

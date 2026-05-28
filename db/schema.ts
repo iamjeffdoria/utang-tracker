@@ -19,3 +19,13 @@ export const debts = sqliteTable('debts', {
   status: text('status').notNull(),         // "unpaid" | "paid"
   createdAt: text('created_at').notNull(),
 })
+
+export const notifications = sqliteTable('notifications', {
+  id: text('id').primaryKey(),
+  clerkId: text('clerk_id').notNull(),
+  type: text('type').notNull(),        // 'due' | 'paid' | 'overdue' | 'reminder' | 'new'
+  title: text('title').notNull(),
+  message: text('message').notNull(),
+  read: text('read').notNull(),        // 'true' | 'false' (SQLite has no boolean)
+  createdAt: text('created_at').notNull(),
+})

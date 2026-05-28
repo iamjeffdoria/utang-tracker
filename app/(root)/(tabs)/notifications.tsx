@@ -1,77 +1,30 @@
 import { Ionicons } from '@expo/vector-icons'
-import { useState } from 'react'
+import { useFocusEffect } from 'expo-router'
+import { useCallback } from 'react'
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useNotifications } from '../../../hooks/useNotifications'
 
 type Notification = {
   id: string
-  type: 'due' | 'paid' | 'overdue' | 'reminder' | 'new'
+  type: string
   title: string
   message: string
   time: string
   read: boolean
 }
 
-const DUMMY: Notification[] = [
-  {
-    id: '1',
-    type: 'overdue',
-    title: 'Overdue Debt!',
-    message: 'Juan dela Cruz owes you ₱1,500. Payment was due 3 days ago.',
-    time: '2h ago',
-    read: false,
-  },
-  {
-    id: '2',
-    type: 'paid',
-    title: 'Debt Settled',
-    message: 'Maria Santos marked ₱800 as paid. Great news!',
-    time: '5h ago',
-    read: false,
-  },
-  {
-    id: '3',
-    type: 'due',
-    title: 'Due Tomorrow',
-    message: 'You owe Pedro Reyes ₱2,200. Payment is due tomorrow.',
-    time: '1d ago',
-    read: false,
-  },
-  {
-    id: '4',
-    type: 'reminder',
-    title: 'Friendly Reminder',
-    message: 'Don\'t forget! Ana Lim owes you ₱350 due this Friday.',
-    time: '2d ago',
-    read: true,
-  },
-  {
-    id: '5',
-    type: 'new',
-    title: 'New Debt Added',
-    message: 'You added a debt of ₱5,000 from Carlo Bautista.',
-    time: '3d ago',
-    read: true,
-  },
-  {
-    id: '6',
-    type: 'paid',
-    title: 'Debt Settled',
-    message: 'You paid ₱1,000 to Jess Ramos successfully.',
-    time: '4d ago',
-    read: true,
-  },
-  {
-    id: '7',
-    type: 'overdue',
-    title: 'Overdue Debt!',
-    message: 'You owe Mark Villanueva ₱3,750. Overdue by 1 week.',
-    time: '5d ago',
-    read: true,
-  },
-]
+function formatRelativeTime(isoString: string): string {
+  const diff = Date.now() - new Date(isoString).getTime()
+  const mins = Math.floor(diff / 60000)
+  if (mins < 60) return `${mins}m ago`
+  const hrs = Math.floor(mins / 60)
+  if (hrs < 24) return `${hrs}h ago`
+  const days = Math.floor(hrs / 24)
+  return `${days}d ago`
+}
 
-const iconMap = {
+const iconMap: Record<string, { name: string; color: string; bg: string }> = {
   overdue: { name: 'alert-circle', color: '#EF4444', bg: 'bg-red-50 border-red-200' },
   paid: { name: 'checkmark-circle', color: '#22C55E', bg: 'bg-green-50 border-green-200' },
   due: { name: 'time', color: '#F59E0B', bg: 'bg-amber-50 border-amber-200' },
@@ -80,19 +33,22 @@ const iconMap = {
 }
 
 export default function Notifications() {
-  const [notifications, setNotifications] = useState(DUMMY)
+  const { notificationList, fetchNotifications, markRead: markReadDB, markAllRead: markAllReadDB } = useNotifications()
+  useFocusEffect(
+    useCallback(() => {
+      fetchNotifications()
+    }, [])
+  )
+  const notifications: Notification[] = notificationList.map(n => ({
+    ...n,
+    read: n.read === 'true',
+    time: formatRelativeTime(n.createdAt),
+  }))
 
   const unreadCount = notifications.filter(n => !n.read).length
 
-  const markAllRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })))
-  }
-
-  const markRead = (id: string) => {
-    setNotifications(prev =>
-      prev.map(n => n.id === id ? { ...n, read: true } : n)
-    )
-  }
+  const markAllRead = () => markAllReadDB()
+  const markRead = (id: string) => markReadDB(id)
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
@@ -131,7 +87,7 @@ export default function Notifications() {
           </View>
         ) : (
           notifications.map(n => {
-            const icon = iconMap[n.type]
+            const icon = iconMap[n.type] ?? iconMap['new']
             return (
               <TouchableOpacity
                 key={n.id}

@@ -26,4 +26,17 @@ export async function runMigrations() {
     )
   `)
   console.log('Migrations ran ✅')
+
+  await db.run(`
+  CREATE TABLE IF NOT EXISTS notifications (
+    id TEXT PRIMARY KEY NOT NULL,
+    clerk_id TEXT NOT NULL,
+    type TEXT NOT NULL,
+    title TEXT NOT NULL,
+    message TEXT NOT NULL,
+    read TEXT NOT NULL DEFAULT 'false',
+    created_at TEXT NOT NULL
+  )
+`)
+
 }

@@ -1,7 +1,7 @@
 import { useAuth, useUser } from '@clerk/expo';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Profile() {
@@ -96,15 +96,45 @@ export default function Profile() {
 
         </View>
 
-        {/* Sign Out Button */}
-        <TouchableOpacity
-          className="flex-row items-center justify-center bg-red-500 rounded-2xl py-4 gap-2"
-          onPress={() => signOut()}
-          activeOpacity={0.8}
-        >
-          <Ionicons name="log-out-outline" size={18} color="white" />
-          <Text className="text-white font-extrabold text-base">Sign Out</Text>
-        </TouchableOpacity>
+      {/* Sign Out Button */}
+      <TouchableOpacity
+        className="flex-row items-center justify-between bg-white border border-slate-200 rounded-3xl px-5 py-4"
+        activeOpacity={0.8}
+        onPress={() =>
+          Alert.alert(
+            'Sign Out',
+            'Are you sure you want to sign out?',
+            [
+              {
+                text: 'Cancel',
+                style: 'cancel',
+              },
+              {
+                text: 'Sign Out',
+                style: 'destructive',
+                onPress: () => signOut(),
+              },
+            ]
+          )
+        }
+      >
+        <View className="flex-row items-center">
+          <View className="w-10 h-10 rounded-2xl bg-red-50 border border-red-100 items-center justify-center mr-3">
+            <Ionicons name="log-out-outline" size={18} color="#ef4444" />
+          </View>
+
+          <View>
+            <Text className="text-slate-800 font-bold text-sm">
+              Sign Out
+            </Text>
+            <Text className="text-slate-400 text-xs mt-0.5">
+              Logout from your account
+            </Text>
+          </View>
+        </View>
+
+        <Ionicons name="chevron-forward" size={18} color="#cbd5e1" />
+      </TouchableOpacity>
 
       </View>
     </SafeAreaView>
