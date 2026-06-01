@@ -30,24 +30,24 @@ export default function NoInternetScreen({ onRetry }: Props) {
       </Text>
 
       <TouchableOpacity
-        onPress={openWifiSettings}
-        className="mt-8 bg-blue-500 rounded-2xl px-8 py-4 w-full items-center"
-      >
-        <Text className="text-white text-base"
-          style={{ fontFamily: 'Poppins_600SemiBold' }}>
-          Open WiFi Settings
-        </Text>
-      </TouchableOpacity>
+              onPress={openWifiSettings}
+              className="mt-8 bg-green-500 rounded-2xl px-8 py-4 w-full items-center"
+            >
+              <Text className="text-white text-base"
+                style={{ fontFamily: 'Poppins_600SemiBold' }}>
+                Open WiFi Settings
+              </Text>
+            </TouchableOpacity>
 
-      <TouchableOpacity
-        onPress={onRetry}
-        className="mt-3 border border-blue-500 rounded-2xl px-8 py-4 w-full items-center"
-      >
-        <Text className="text-blue-500 text-base"
-          style={{ fontFamily: 'Poppins_600SemiBold' }}>
-          Retry
-        </Text>
-      </TouchableOpacity>
+            <TouchableOpacity
+              onPress={onRetry}
+              className="mt-3 border border-green-500 rounded-2xl px-8 py-4 w-full items-center"
+            >
+              <Text className="text-green-500 text-base"
+                style={{ fontFamily: 'Poppins_600SemiBold' }}>
+                Retry
+              </Text>
+            </TouchableOpacity>
     </View>
   );
 }

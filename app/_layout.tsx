@@ -30,25 +30,16 @@ export default function RootLayout() {
     Poppins_800ExtraBold,
   });
 
-useEffect(() => {
-  const timeout = setTimeout(() => {
-    setIsConnected(prev => prev === null ? false : prev);
-  }, 3000);
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setIsConnected(prev => prev === null ? false : prev);
+    }, 3000);
 
-  NetInfo.fetch().then((state: NetInfoState) => {
-    clearTimeout(timeout);
-    setIsConnected(state.isConnected);
-  });
-
-  const unsubscribe = NetInfo.addEventListener((state: NetInfoState) => {
-    setIsConnected(state.isConnected);
-  });
-
-  return () => {
-    clearTimeout(timeout);
-    unsubscribe();
-  };
-}, []);
+    NetInfo.fetch().then((state: NetInfoState) => {
+      clearTimeout(timeout);
+      setIsConnected(state.isConnected);
+    });
+  }, []);
   useEffect(() => {
     runMigrations().then(() => setDbReady(true)); 
   }, []);

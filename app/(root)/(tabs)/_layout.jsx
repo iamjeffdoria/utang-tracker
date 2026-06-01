@@ -1,6 +1,6 @@
 import { Tabs, useRouter } from "expo-router";
 import { BarChart2, Bell, House, Plus, Receipt, User, UserPlus, Wallet } from "lucide-react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
@@ -11,7 +11,15 @@ export default function TabsLayout() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { addContact } = useContacts();
-  const { addNotification } = useNotifications();
+  const { addNotification, notificationList, fetchNotifications } = useNotifications();
+
+  const unreadCount = notificationList.filter(n => n.read === 'false').length;
+
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 10_000);
+    return () => clearInterval(interval);
+  }, []);
 
   const [actionSheetVisible, setActionSheetVisible] = useState(false);
   const [addContactVisible, setAddContactVisible] = useState(false);
@@ -156,9 +164,20 @@ export default function TabsLayout() {
           options={{
             title: "Notifications",
             tabBarIcon: ({ color, size }) => <Bell color={color} size={size} />,
+            tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
+            tabBarBadgeStyle: {
+              backgroundColor: '#ef4444',
+              color: 'white',
+              fontSize: 10,
+              fontWeight: '700',
+              minWidth: 16,
+              height: 16,
+              lineHeight: 16,
+              borderRadius: 8,
+            },
           }}
         />
-        <Tabs.Screen
+                <Tabs.Screen
           name="profile"
           options={{
             title: "Profile",
