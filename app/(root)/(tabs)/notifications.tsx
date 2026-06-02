@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useFocusEffect } from 'expo-router'
-import { useCallback } from 'react'
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native'
+import { useCallback, useState } from 'react'
+import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useNotifications } from '../../../hooks/useNotifications'
 
@@ -35,10 +35,18 @@ const iconMap: Record<string, { name: string; color: string; bg: string }> = {
 export default function Notifications() {
   const { notificationList, fetchNotifications, markRead: markReadDB, markAllRead: markAllReadDB } = useNotifications()
   useFocusEffect(
-    useCallback(() => {
-      fetchNotifications()
+      useCallback(() => {
+        fetchNotifications()
+      }, [])
+    )
+
+    const [refreshing, setRefreshing] = useState(false)
+
+    const onRefresh = useCallback(async () => {
+      setRefreshing(true)
+      await fetchNotifications()
+      setRefreshing(false)
     }, [])
-  )
   const notifications: Notification[] = notificationList.map(n => ({
     ...n,
     read: n.read === 'true',
@@ -79,6 +87,9 @@ export default function Notifications() {
         className="flex-1"
         contentContainerStyle={{ paddingVertical: 12 }}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#22c55e']} tintColor="#22c55e" />
+        }
       >
         {notifications.length === 0 ? (
           <View className="flex-1 items-center justify-center py-24">

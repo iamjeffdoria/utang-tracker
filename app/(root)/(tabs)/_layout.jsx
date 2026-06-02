@@ -1,7 +1,7 @@
 import { Tabs, useRouter } from "expo-router";
 import { BarChart2, Bell, House, Plus, Receipt, User, UserPlus, Wallet } from "lucide-react-native";
 import { useEffect, useState } from "react";
-import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { KeyboardAvoidingView, Modal, Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { useContacts } from "../../../hooks/useContacts";
@@ -295,7 +295,8 @@ export default function TabsLayout() {
         transparent
         onRequestClose={() => setAddContactVisible(false)}
       >
-        <View
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{ flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(0,0,0,0.4)" }}
         >
           <View
@@ -421,8 +422,8 @@ export default function TabsLayout() {
                 {saving ? "Saving..." : "Save Contact"}
               </Text>
             </TouchableOpacity>
-          </View>
         </View>
+        </KeyboardAvoidingView>
       </Modal>
     </>
   );

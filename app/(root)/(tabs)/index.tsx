@@ -1,8 +1,12 @@
 import { Ionicons } from '@expo/vector-icons'
-import { useEffect, useState } from 'react'
+import { useFocusEffect } from 'expo-router'
+import { useCallback, useState } from 'react'
 import {
   Alert,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
+  RefreshControl,
   ScrollView,
   Text,
   TextInput,
@@ -32,10 +36,21 @@ export default function HomeScreen() {
   const [editLastName, setEditLastName] = useState('')
   const [updating, setUpdating] = useState(false)
 
-  useEffect(() => {
-    fetchContacts()
-    fetchDebts()
-  }, [])
+  const [refreshing, setRefreshing] = useState(false)
+
+  const onRefresh = useCallback(async () => {
+      setRefreshing(true)
+      await fetchContacts()
+      await fetchDebts()
+      setRefreshing(false)
+    }, [])
+
+    useFocusEffect(
+    useCallback(() => {
+      fetchContacts()
+      fetchDebts()
+    }, [])
+  )
 
   const handleAddContact = async () => {
     if (!fullName.trim()) return
@@ -109,19 +124,29 @@ const handleUpdateContact = async () => {
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
-      <ScrollView className="flex-1 px-6 pt-4" showsVerticalScrollIndicator={false}>
+      <ScrollView
+        className="flex-1 px-6 pt-4"
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#22c55e']} tintColor="#22c55e" />
+        }
+      >
 
-        {/* Title */}
-      <View className="items-center mb-6">
-        <View className="flex-row items-center gap-2">
-          <Ionicons name="wallet-outline" size={22} color="#1e293b" />
+      {/* Header */}
+      <View className="flex-row items-center justify-between mb-5">
+        <View>
           <Text className="text-slate-800 text-2xl font-extrabold tracking-tight">
-            Your Debt Summary
+            Debt Summary
+          </Text>
+          <Text className="text-slate-400 text-xs mt-0.5">
+            Stay on top of your finances
           </Text>
         </View>
-        <Text className="text-slate-400 text-xs mt-1">
-          Stay on top of your finances
-        </Text>
+        <View className="bg-yellow-50 border border-yellow-100 rounded-2xl px-3 py-1.5">
+          <Text className="text-yellow-600 text-xs font-bold">
+            {debtList.filter(d => d.status === 'unpaid').length} unpaid
+          </Text>
+        </View>
       </View>
 
         {/* Overview */}
@@ -346,8 +371,11 @@ const handleUpdateContact = async () => {
         transparent
         onRequestClose={() => setModalVisible(false)}
       >
-        <View className="flex-1 justify-end bg-black/40">
-          <View className="bg-white rounded-t-3xl px-6 pt-6 pb-10">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.4)' }}
+      >
+        <View className="bg-white rounded-t-3xl px-6 pt-6 pb-10">
 
             {/* Modal Header */}
             <View className="flex-row items-center justify-between mb-6">
@@ -394,17 +422,20 @@ const handleUpdateContact = async () => {
             </TouchableOpacity>
 
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
 
-      {/* Edit Contact Modal */}
+      {/* Edit Contact Modal */} 
 <Modal
   visible={editModalVisible}
   animationType="slide"
   transparent
   onRequestClose={() => setEditModalVisible(false)}
 >
-  <View className="flex-1 justify-end bg-black/40">
+    <KeyboardAvoidingView
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.4)' }}
+  >
     <View className="bg-white rounded-t-3xl px-6 pt-6 pb-10">
 
       {/* Modal Header */}
@@ -452,7 +483,7 @@ const handleUpdateContact = async () => {
       </TouchableOpacity>
 
     </View>
-  </View>
+  </KeyboardAvoidingView>
 </Modal>
 
     </SafeAreaView>

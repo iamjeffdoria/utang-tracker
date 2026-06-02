@@ -5,8 +5,10 @@ import { useCallback, useState } from 'react'
 
 import {
   Alert,
+  KeyboardAvoidingView,
   Modal,
   Platform,
+  RefreshControl,
   ScrollView,
   Switch,
   Text,
@@ -44,6 +46,14 @@ export default function AddDebt() {
 
   // List filter
   const [listSearch, setListSearch] = useState('')
+  const [refreshing, setRefreshing] = useState(false)
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true)
+    await fetchContacts()
+    await fetchDebts()
+    setRefreshing(false)
+  }, [])
 
   useFocusEffect(
     useCallback(() => {
@@ -177,19 +187,26 @@ export default function AddDebt() {
         className="flex-1 px-5 pt-4"
         contentContainerStyle={{ paddingBottom: 24 }}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#22c55e']} tintColor="#22c55e" />
+        }
       >
 
         {/* Header */}
-        <View className="items-center mb-6">
-          <View className="flex-row items-center gap-2">
-            <Ionicons name="receipt-outline" size={22} color="#1e293b" />
+        <View className="flex-row items-center justify-between mb-5">
+          <View>
             <Text className="text-slate-800 text-2xl font-extrabold tracking-tight">
               Debt Records
             </Text>
+            <Text className="text-slate-400 text-xs mt-0.5">
+              Track what you owe and what's owed to you
+            </Text>
           </View>
-          <Text className="text-slate-400 text-xs mt-1">
-            Track what you owe and what's owed to you
-          </Text>
+          <View className="bg-yellow-50 border border-yellow-100 rounded-2xl px-3 py-1.5">
+            <Text className="text-yellow-600 text-xs font-bold">
+              {debtList.filter(d => d.status === 'unpaid').length} unpaid
+            </Text>
+          </View>
         </View>
       <View className="flex-row gap-4 mb-7">
           <View className="flex-1 bg-red-500 rounded-2xl p-4">
@@ -421,8 +438,12 @@ export default function AddDebt() {
         transparent
         onRequestClose={() => { setAddModalVisible(false); resetForm() }}
       >
-        <View className="flex-1 justify-end bg-black/40">
-          <View className="bg-white rounded-t-3xl px-6 pt-6 pb-10" style={{ maxHeight: '90%' }}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1, justifyContent: 'flex-end' }}
+        className="bg-black/40"
+      >
+        <View className="bg-white rounded-t-3xl px-6 pt-6 pb-10" style={{ maxHeight: '90%' }}>
 
             {/* Modal Header */}
             <View className="flex-row items-center justify-between mb-6">
@@ -567,7 +588,7 @@ export default function AddDebt() {
               </View>
             </ScrollView>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* ── Contact Picker Modal ── */}
@@ -577,8 +598,11 @@ export default function AddDebt() {
         transparent
         onRequestClose={() => setContactModalVisible(false)}
       >
-        <View className="flex-1 justify-end bg-black/40">
-          <View className="bg-white rounded-t-3xl px-6 pt-6 pb-10" style={{ maxHeight: '75%' }}>
+       <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.4)' }}
+      >
+        <View className="bg-white rounded-t-3xl px-6 pt-6 pb-10" style={{ maxHeight: '75%' }}>
 
             <View className="flex-row items-center justify-between mb-4">
               <Text className="text-slate-800 text-lg font-extrabold">Select Contact</Text>
@@ -644,8 +668,8 @@ export default function AddDebt() {
                 )}
               </View>
             </ScrollView>
-          </View>
-        </View>
+            </View>
+        </KeyboardAvoidingView>
       </Modal>
 
             {/* ── Edit Debt Modal ── */}
@@ -655,8 +679,12 @@ export default function AddDebt() {
         transparent
         onRequestClose={() => { setEditModalVisible(false); setEditingDebt(null); resetForm() }}
       >
-        <View className="flex-1 justify-end bg-black/40">
-          <View className="bg-white rounded-t-3xl px-6 pt-6 pb-10" style={{ maxHeight: '90%' }}>
+       <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={{ flex: 1, justifyContent: 'flex-end' }}
+            className="bg-black/40"
+          >
+            <View className="bg-white rounded-t-3xl px-6 pt-6 pb-10" style={{ maxHeight: '90%' }}>
 
             {/* Modal Header */}
             <View className="flex-row items-center justify-between mb-6">
@@ -800,8 +828,8 @@ export default function AddDebt() {
 
               </View>
             </ScrollView>
-          </View>
-        </View>
+         </View>
+        </KeyboardAvoidingView>
       </Modal>
 
     </SafeAreaView>
