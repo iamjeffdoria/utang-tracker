@@ -139,156 +139,88 @@ export default function Profile() {
             </View>
           </View>
 
-                        {/* Analytics */}
-              <View
-                className="rounded-3xl p-5 mb-6"
-                style={{
-                  backgroundColor: '#FFFFFF',
-                  borderWidth: 1,
-                  borderColor: '#E2E8F0',
-                  shadowColor: '#8B5CF6',
-                  shadowOpacity: 0.12,
-                  shadowRadius: 12,
-                  elevation: 6,
-                }}
-              >
-                {/* Header */}
-                <View className="flex-row items-center">
-                  <Ionicons
-                    name="stats-chart"
-                    size={22}
-                    color="#7C3AED"
-                  />
-                  <Text
-                    className="text-lg font-bold ml-2"
-                    style={{ color: '#7C3AED' }}
-                  >
-                    Analytics Dashboard
-                  </Text>
-                </View>
+          <View
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 24,
+              padding: 20,
+              marginBottom: 24,
+              borderWidth: 0.5,
+              borderColor: '#E2E8F0',
+            }}
+          >
+            {/* Header */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 2 }}>
+              <Ionicons name="stats-chart" size={18} color="#111827" />
+              <Text style={{ fontSize: 16, fontWeight: '600', color: '#111827', marginLeft: 8 }}>
+                Analytics
+              </Text>
+            </View>
+            <Text style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 20 }}>
+              Real-time performance overview
+            </Text>
 
-                <Text
-                  className="text-xs mt-1 mb-5"
-                  style={{ color: '#64748B' }}
-                >
-                  Real-time performance overview
-                </Text>
+            {/* Daily Traffic */}
+            <Text style={{ fontSize: 12, fontWeight: '500', color: '#6B7280', marginBottom: 10, letterSpacing: 0.5, textTransform: 'uppercase' }}>
+              Daily Traffic
+            </Text>
+            <LineChart
+              data={{
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+                datasets: [{ data: [120, 180, 150, 250, 300, 280] }],
+              }}
+              width={screenWidth - 64}
+              height={180}
+              bezier
+              withInnerLines={false}
+              withOuterLines={false}
+              chartConfig={{
+                backgroundGradientFrom: '#FFFFFF',
+                backgroundGradientTo: '#FFFFFF',
+                decimalPlaces: 0,
+                color: (opacity = 1) => `rgba(17, 24, 39, ${opacity})`,
+                labelColor: () => '#9CA3AF',
+                propsForDots: {
+                  r: '4',
+                  strokeWidth: '0',
+                  fill: '#111827',
+                },
+              }}
+              style={{ borderRadius: 0, marginLeft: -16 }}
+            />
 
-                {/* Daily Traffic */}
-                <View
-                  style={{
-                    backgroundColor: '#F5F3FF',
-                    borderRadius: 20,
-                    padding: 12,
-                    marginBottom: 20,
-                  }}
-                >
-                  <View className="flex-row items-center mb-3">
-                    <Ionicons
-                      name="trending-up"
-                      size={20}
-                      color="#6D28D9"
-                    />
-                    <Text
-                      className="font-semibold ml-2"
-                      style={{ color: '#6D28D9' }}
-                    >
-                      Daily Traffic
-                    </Text>
-                  </View>
+            {/* Divider */}
+            <View style={{ height: 0.5, backgroundColor: '#F3F4F6', marginVertical: 20 }} />
 
-                  <LineChart
-                    data={{
-                      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-                      datasets: [
-                        {
-                          data: [120, 180, 150, 250, 300, 280],
-                        },
-                      ],
-                    }}
-                    width={screenWidth - 94}
-                    height={220}
-                    bezier
-                    chartConfig={{
-                      backgroundGradientFrom: '#F5F3FF',
-                      backgroundGradientTo: '#EEF2FF',
-                      decimalPlaces: 0,
-                      color: (opacity = 1) =>
-                        `rgba(139,92,246,${opacity})`,
-                      labelColor: (opacity = 1) =>
-                        `rgba(79,70,229,${opacity})`,
-                      propsForDots: {
-                        r: '6',
-                        strokeWidth: '2',
-                        stroke: '#A855F7',
-                      },
-                      propsForBackgroundLines: {
-                        stroke: '#DDD6FE',
-                      },
-                    }}
-                    style={{
-                      borderRadius: 18,
-                    }}
-                  />
-                </View>
-
-                {/* Monthly Activity */}
-                <View
-                  style={{
-                    backgroundColor: '#ECFDF5',
-                    borderRadius: 20,
-                    padding: 12,
-                  }}
-                >
-                  <View className="flex-row items-center mb-3">
-                    <Ionicons
-                      name="bar-chart"
-                      size={20}
-                      color="#059669"
-                    />
-                    <Text
-                      className="font-semibold ml-2"
-                      style={{ color: '#059669' }}
-                    >
-                      Monthly Activity
-                    </Text>
-                  </View>
-
-                  <BarChart
-                    data={{
-                      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-                      datasets: [
-                        {
-                          data: [30, 45, 28, 80, 99],
-                        },
-                      ],
-                    }}
-                    width={screenWidth - 94}
-                    height={220}
-                    yAxisLabel=""
-                    yAxisSuffix=""
-                    fromZero
-                    chartConfig={{
-                      backgroundGradientFrom: '#ECFDF5',
-                      backgroundGradientTo: '#D1FAE5',
-                      decimalPlaces: 0,
-                      color: (opacity = 1) =>
-                        `rgba(16,185,129,${opacity})`,
-                      labelColor: (opacity = 1) =>
-                        `rgba(5,150,105,${opacity})`,
-                      fillShadowGradient: '#10B981',
-                      fillShadowGradientOpacity: 1,
-                      propsForBackgroundLines: {
-                        stroke: '#A7F3D0',
-                      },
-                    }}
-                    style={{
-                      borderRadius: 18,
-                      marginTop: 4,
-                    }}
-                  />
-                </View>
-              </View>
+            {/* Monthly Activity */}
+            <Text style={{ fontSize: 12, fontWeight: '500', color: '#6B7280', marginBottom: 10, letterSpacing: 0.5, textTransform: 'uppercase' }}>
+              Monthly Activity
+            </Text>
+            <BarChart
+              data={{
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                datasets: [{ data: [30, 45, 28, 80, 99] }],
+              }}
+              width={screenWidth - 64}
+              height={180}
+              yAxisLabel=""
+              yAxisSuffix=""
+              fromZero
+              withInnerLines={false}
+              showBarTops={false}
+              chartConfig={{
+                backgroundGradientFrom: '#FFFFFF',
+                backgroundGradientTo: '#FFFFFF',
+                decimalPlaces: 0,
+                color: (opacity = 1) => `rgba(17, 24, 39, ${opacity})`,
+                labelColor: () => '#9CA3AF',
+                fillShadowGradient: '#111827',
+                fillShadowGradientOpacity: 1,
+                propsForBackgroundLines: { stroke: 'transparent' },
+              }}
+              style={{ borderRadius: 0, marginLeft: -16 }}
+            />
+          </View>
 
           {/* Sign Out Button */}
           <TouchableOpacity
