@@ -39,4 +39,16 @@ export async function runMigrations() {
   )
 `)
 
+  await db.run(`
+    CREATE TABLE IF NOT EXISTS onboarding (
+      id TEXT PRIMARY KEY NOT NULL,
+      clerk_id TEXT NOT NULL UNIQUE,
+      completed TEXT NOT NULL DEFAULT 'false',
+      current_step TEXT NOT NULL DEFAULT '0',
+      completed_at TEXT,
+      created_at TEXT NOT NULL
+    )
+  `)
+  console.log('Migrations ran ✅')
+
 }

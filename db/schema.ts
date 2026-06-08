@@ -29,3 +29,12 @@ export const notifications = sqliteTable('notifications', {
   read: text('read').notNull(),        // 'true' | 'false' (SQLite has no boolean)
   createdAt: text('created_at').notNull(),
 })
+
+export const onboarding = sqliteTable('onboarding', {
+  id: text('id').primaryKey(),
+  clerkId: text('clerk_id').notNull().unique(),
+  completed: text('completed').notNull().default('false'), // 'true' | 'false'
+  currentStep: text('current_step').notNull().default('0'), // step index as string
+  completedAt: text('completed_at'),
+  createdAt: text('created_at').notNull(),
+})
